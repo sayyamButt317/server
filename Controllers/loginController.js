@@ -32,7 +32,7 @@ const loginController = async (req, res) => {
     }
 
     // Generate JWT token
-    const accessToken = jwt.sign(
+    const accessToken = await jwt.sign(
       { id: user._id }, 
       process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXP,
