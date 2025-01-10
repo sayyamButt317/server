@@ -7,6 +7,7 @@ const ProductSchema = new mongoose.Schema(
       required: true ,
       unique: true,
       trim: true,
+      index:true,
     },
     productDescription: {
       type: String,
@@ -29,6 +30,7 @@ const ProductSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
+      index:true,
     },
     stock: {
       type: Number,
@@ -43,21 +45,26 @@ const ProductSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
+      index:true,
       enum: ["Available", "Unavailable", "Out of Stock"],
     },
     gender:{
       type:String,
       required:false,
       enum: ["men", "women",],
+    },
+    productImage:{
+      type:String,
+      required:true
     }
   },
   { timestamps: true }
 );
 
 // Create unique index for productName
-ProductSchema.index({ productName: 1 }, { unique: true });
-ProductSchema.index({ category: 1 });
-ProductSchema.index({ status: 1 });
+// ProductSchema.index({ productName: 1 }, { unique: true });
+// ProductSchema.index({ category: 1 });
+// ProductSchema.index({ status: 1 });
 
 
 const ProductModel = mongoose.model("Product", ProductSchema);
