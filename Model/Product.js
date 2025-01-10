@@ -4,14 +4,14 @@ const ProductSchema = new mongoose.Schema(
   {
     productName: {
       type: String,
-      required: true ,
+      required: true,
       unique: true,
       trim: true,
-      index:true,
+      index: true,
     },
     productDescription: {
       type: String,
-      required: true ,
+      required: true,
     },
     price: {
       type: Number,
@@ -23,19 +23,19 @@ const ProductSchema = new mongoose.Schema(
       required: false,
       min: 0,
     },
-    discountType:{
-      type:String,
-      required:false,
-    },
-    category: {
+    discountType: {
       type: String,
-      required: true,
-      index:true,
+      required: false,
     },
     stock: {
       type: Number,
       required: true,
       min: 0,
+    },
+     category: {
+      type: String,
+      required: true,
+      index:true,
     },
     size:{
       type:String,
@@ -53,10 +53,10 @@ const ProductSchema = new mongoose.Schema(
       required:false,
       enum: ["men", "women",],
     },
-    productImage:{
-      type:String,
-      required:true
-    }
+    // productImage: {
+    //   type: String,
+    //   required: true,
+    // },
   },
   { timestamps: true }
 );
@@ -65,7 +65,6 @@ const ProductSchema = new mongoose.Schema(
 // ProductSchema.index({ productName: 1 }, { unique: true });
 // ProductSchema.index({ category: 1 });
 // ProductSchema.index({ status: 1 });
-
 
 const ProductModel = mongoose.model("Product", ProductSchema);
 export default ProductModel;
