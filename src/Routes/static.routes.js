@@ -11,6 +11,8 @@ import {AllUserController,getSingleUsers} from "../Controllers/user.Controller.j
 import registerController from "../Controllers/register.Controller.js";
 import loginController from "../Controllers/login.Controller.js";
 
+
+
 const router = Router();
 
 // Product routes

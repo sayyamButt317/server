@@ -1,12 +1,19 @@
 import ProductModel from "../Model/Product.js";
+import redisClient from '../utils/redisConfig.js';
 
 const getProductsController = async (req, res) => {
   try {
+    // check data is available in cache
+    const cachedData = redisClient.get('data')
+    if(cachedData) return res.json({cachedData})
     // Fetch all products sorted by price if 'id' is not provided
     const products = await ProductModel.find().sort({ price: 1 });
     return res.status(200).json(products );
-
-  } catch (error) {
+    // store data in cache
+    await redisClient.set('data',JSON.stringify(data));
+    return res.json({products})
+  } 
+  catch (error) {
     // Handle any errors
     return res.status(500).json({ status: 500, error: 'Server error', details: error.message });
   }
