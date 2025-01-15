@@ -5,7 +5,6 @@ import {
   addProductController,
   editProductController,
   deleteProductController,
-  getSingleProductController
 } from "../Controllers/product.Controller.js";
 import registerController from "../Controllers/register.Controller.js";
 import loginController from "../Controllers/login.Controller.js";
@@ -19,7 +18,6 @@ router.post("/create", addProductController)
 router.patch("/edit",editProductController)
 router.delete("/delete",deleteProductController);
 
-router.get(`/products/search/:id`,getSingleProductController)
 
 router.post("/users/register", registerController)
 router.post("/users/login", loginController);
