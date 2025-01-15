@@ -3,8 +3,8 @@ import ProductModel from "../Model/Product.js";
 const getProductsController = async (req, res) => {
   try {
     // Fetch all products sorted by price if 'id' is not provided
-    const products = await ProductModel.find().populate.sort({ price: 1 });
-    return res.status(200).json({ status: 200, data: products });
+    const products = await ProductModel.find().sort({ price: 1 });
+    return res.status(200).json(products );
 
   } catch (error) {
     // Handle any errors
