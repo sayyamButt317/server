@@ -1,37 +1,39 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
+// Configuration
 cloudinary.config({
-  cloud_name: "dkpezyd12",
-  // process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: "462622549377856",
-  // process.env.CLOUDINARY_API_KEY,
-  api_secret: "_VcuBKRh5oigY9XcwILa9JcwNGo",
-  // process.env.CLOUDINARY_SECRET_KEY,
+  cloud_name: 'dkpezyd12',
+  api_key: '462622549377856',
+  api_secret: '_VcuBKRh5oigY9XcwILa9JcwNGo',
 });
 
-cloudinary.uploader.upload(
-  "https://upload.wikimedia.org/wikipedia/commons/a/ae/Olympic_flag.jpg",
-  { public_id: "olympic_flag" },
-  function (error, result) {
-    console.log(result);
-  }
-);
+
 //upload file on cloudinary
-const uploadOnCloudinary = async (localFilePath) => {
+
+const uploadOnCloudinary = async (filePath, folderName) => {
   try {
-    if (!localFilePath) return null;
-    //upload the File on Cloudinary
-    const response = await cloudinary.uploader.upload(localFilePath, {
+    const result = await cloudinary.uploader.upload(filePath, {
+      folder: folderName,
       resource_type: "auto",
     });
-    //file has been uploaded on successfull
-    console.log("File is uploaded on cloudinary", response.url);
-    return response;
+
+    // Attempt to delete the local file
+    try {
+      fs.unlinkSync(filePath);
+      console.log("Local file deleted successfully.");
+    } catch (unlinkError) {
+      console.error("Error deleting the file locally:", unlinkError.message);
+    }
+
+    console.log("Image uploaded to Cloudinary:", result.secure_url);
+    return {
+      secure_url: result.secure_url,
+      public_id: result.public_id,
+    };
   } catch (error) {
-    //remove the locally save temporary file as the upload operation got failed
-    fs.unlinkSync(localFilePath);
-    return null;
+    console.error("Error uploading image to Cloudinary:", error.message);
+    return null; // Return null if upload fails
   }
 };
 

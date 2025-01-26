@@ -1,7 +1,9 @@
 import ProductModel from "../Model/Product.js";
+import { uploadOnCloudinary } from "../Config/cloudinaryConfig.js";
+import { error } from "console";
 
-const getSingleProductController = async (req, res) => {
-  const productId = req.params.ProductId;
+const getProductByIdController = async (req, res) => {
+  const productId = req.params.id;
   try {
     const product = await ProductModel.findOne({ _id: productId });
     if (!product) {
@@ -9,18 +11,20 @@ const getSingleProductController = async (req, res) => {
         .status(404)
         .json({ status: 404, message: "Product not found" });
     }
+    return res.status(200).json({ product });
   } catch (error) {
-      return res
-        .status(500)
-        .json({ status: 500, error: "Server error", details: error.message });
-    }
-  
+    return res
+      .status(500)
+      .json({ status: 500, error: "Server error", details: error.message });
+  }
 };
 
-const getProductsController = async (req, res) => {
+const getAllProductsController = async (req, res) => {
   try {
     // Fetch all products sorted by price
-    const products = await ProductModel.find().populate("productName").sort({ price: 1 });
+    const products = await ProductModel.find()
+      .populate("productName")
+      .sort({ price: 1 });
     return res.status(200).json({ products });
   } catch (error) {
     return res
@@ -31,25 +35,75 @@ const getProductsController = async (req, res) => {
 
 const addProductController = async (req, res) => {
   try {
-    const Product = new ProductModel(req.body);
-    await Product.save();
-    res.status(201).json({
-      id: Product._id,
+    const {
+      productName,
+      productDescription,
+      price,
+      stock,
+      category,
+      
+    } = req.body;
+
+const picture = req.file?.fieldname;
+const picturePath = req.file?.path;
+
+if (!productName || !productDescription || !price || !stock || !category || !picture || !picturePath ) {
+  return res.status(400).json({
+    success: false,
+    message: "Missing required fields",
+  });
+}
+
+const { secure_url, public_id } = await uploadOnCloudinary(picturePath, "products");
+
+if (!secure_url) {
+  return res.status(400).json({
+    success: false,
+    message: `Failed to upload image ${error.message}`,
+  });
+}
+
+    // Create a new product
+    const newProduct = await ProductModel.create({
+
+      productName,
+      productDescription,
+      price,
+      stock,
+      category,
+      picture: {
+        secure_url,
+        public_id,
+      },
     });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+
+    return res.status(201).json({
+      success: true,
+      message: "Product added successfully",
+      product: newProduct,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to add product",
+      error: error.message,
+    });
   }
 };
 const editProductController = async (req, res) => {
   try {
-    const productId = req.params.ProductId;
+    const productId = req.params.id;
 
-    const updatedProduct = await ProductModel.findByIdAndUpdate(id, req.body, {
-      // Return the updated product
-      new: true,
-      // Validate fields based on schema
-      revalidate: true,
-    });
+    const updatedProduct = await ProductModel.findByIdAndUpdate(
+      productId,
+      req.body,
+      {
+        // Return the updated product
+        new: true,
+        // Validate fields based on schema
+        revalidate: true,
+      }
+    );
     if (!updatedProduct) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -64,13 +118,13 @@ const editProductController = async (req, res) => {
 };
 const deleteProductController = async (req, res) => {
   try {
-    const id = req.params.id;
+    const productId = req.params.id;
     // Check if `id` is provided
-    if (!id) {
+    if (!productId) {
       return res.status(400).json({ message: " Product id is required" });
     }
     // Attempt to delete the product by ID
-    const deletedProduct = await ProductModel.findByIdAndDelete(id);
+    const deletedProduct = await ProductModel.findByIdAndDelete(productId);
     // If no product is found with the given ID
     if (!deletedProduct) {
       return res.status(404).json({ message: "Product not found" });
@@ -83,9 +137,9 @@ const deleteProductController = async (req, res) => {
   }
 };
 export {
-  getProductsController,
+  getAllProductsController,
   addProductController,
   editProductController,
   deleteProductController,
-  getSingleProductController
+  getProductByIdController,
 };
