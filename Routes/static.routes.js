@@ -14,17 +14,27 @@ import {
   
 const router = Router();
 
-router.get("/products", getAllProductsController)
-router.post("/products/create", upload.single("picture"), addProductController)
+// Products Routes
+router.get("/product", getAllProductsController)
+router.post("/product/create", upload.single("picture"), addProductController)
 router.patch("/product/:id/edit",editProductController)
 router.delete("/product/:id/delete",deleteProductController);
-router.get('/products/:id',getProductByIdController)
+router.get('/product/:id',getProductByIdController)
 
+//User Auth Routes
 router.post("/users/register", registerController)
 router.post("/users/login", loginController);
 
+//Payment Routes
 router.post("/checkout",createPaymentIntent)
+router.get("/success",async(req,res)=>{
+  res.send("Payment successful")
+})
+router.get("/canceled", async(req,res)=>{
+  res.send("Payment canceled")
+})
 
+//Role base Login
 router.get("/users", async (req, res) => {
     res.json({ message: "Hello from users" });
   });

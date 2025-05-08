@@ -1,43 +1,36 @@
-import stripe from "stripe";
+import Stripe from "stripe";
 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const stripe = new stripe(stripeSecretKey,{
-  apiVersion: '2025-01-27.acacia',
-});
-const createPaymentIntent = async(req, res) => {
-  
+const DOMAIN = "http://localhost:8000/api";
+
+const createPaymentIntent = async (req, res) => {
   try {
-    const { product ,email} = req.body;
-const extractingItems = await product.map((item) =>{
-quantity:item.quantity,
-price_data: {
-  currency: "usd",
-  unit_amount: Number.parseInt(product.price, 10),
-  product_data:{
-    name: product.name,
-    description: product.description,
-    images: product.image,
-  },
-},
-})
+    const { cart } = req.body;
 
-    const session = await stripe.Checkout.session.create({
+    const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      line_items: extractingItems,
+      line_items: cart.items.map(product =>({
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: product.name,
+            images: [product.picture],
+          },
+          unit_amount: product.price * 100,
+        },
+        quantity: product.quantity,
+      })),
       mode: "payment",
-      success_url: `${req.protocol}://${req.get('host')}/success`,
-      cancel_url: `${req.protocol}://${req.get('host')}/cancel`,
-      customer_email: email,
-    })
-    res.json ({ message:"server is connected",success: true, id:session.id});
+      success_url: `${DOMAIN}/success`,
+      cancel_url: `${DOMAIN}/canceled`,
+    });
+
+    res.json({ id: session.id }); // Redirect ki jagah session ID return karein
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ message: "An error occurred while creating the payment intent" });
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
-}
+};
 
 export default createPaymentIntent;
-

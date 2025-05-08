@@ -11,12 +11,11 @@ const OrderSchema = new mongoose.Schema(
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
         },
+        productName: String,
         quantity: Number,
-        discount: Number,
         totalPrice: Number,
       },
     ],
-    totalPrice: Number,
     orderDate: {
       type: Date,
       default: Date.now,

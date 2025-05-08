@@ -15,4 +15,4 @@ const connectionDB = async () => {
   }
 };
 
-export { connectionDB };
+export default connectionDB ;
