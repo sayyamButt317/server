@@ -5,7 +5,6 @@ const registerController = async (req, res) => {
   try {
     // Destructure the request body
     const { firstname, lastname, email, password } = req.body;
-
     // Check if any required field is empty
     if (!firstname || !lastname || !email || !password) {
       return res.status(400).json({
