@@ -2,6 +2,8 @@ import ProductModel from "../Model/Product.js";
 import { uploadOnCloudinary } from "../Config/cloudinaryConfig.js";
 import { error } from "console";
 
+
+//Get Product ById
 const getProductByIdController = async (req, res) => {
   const productId = req.params.id;
   try {
@@ -18,7 +20,7 @@ const getProductByIdController = async (req, res) => {
       .json({ status: 500, error: "Server error", details: error.message });
   }
 };
-
+// Get all Products
 const getAllProductsController = async (req, res) => {
   try {
     // Fetch all products sorted by price
@@ -33,6 +35,7 @@ const getAllProductsController = async (req, res) => {
   }
 };
 
+//add new Product
 const addProductController = async (req, res) => {
   try {
     const {
@@ -53,30 +56,16 @@ if (!productName || !productDescription || !price || !stock || !category || !pic
     message: "Missing required fields",
   });
 }
-
 const { secure_url, public_id } = await uploadOnCloudinary(picturePath, "products");
-
 if (!secure_url) {
   return res.status(400).json({
     success: false,
     message: `Failed to upload image ${error.message}`,
   });
 }
-
     // Create a new product
-    const newProduct = await ProductModel.create({
-
-      productName,
-      productDescription,
-      price,
-      stock,
-      category,
-      picture: {
-        secure_url,
-        public_id,
-      },
-    });
-
+    const newProduct = await ProductModel.create(
+      {productName, productDescription,price,stock,category,picture: {secure_url,public_id,},});
     return res.status(201).json({
       success: true,
       message: "Product added successfully",
@@ -90,18 +79,17 @@ if (!secure_url) {
     });
   }
 };
+
+//Edit Products
 const editProductController = async (req, res) => {
   try {
     const productId = req.params.id;
-
     const updatedProduct = await ProductModel.findByIdAndUpdate(
       productId,
       req.body,
       {
-        // Return the updated product
-        new: true,
-        // Validate fields based on schema
-        revalidate: true,
+        new: true,  // Return the updated product
+        revalidate: true, // Validate fields based on schema
       }
     );
     if (!updatedProduct) {
@@ -116,6 +104,8 @@ const editProductController = async (req, res) => {
     res.status(500).json({ message: "Server error", details: err.message });
   }
 };
+
+//Delete Product
 const deleteProductController = async (req, res) => {
   try {
     const productId = req.params.id;
